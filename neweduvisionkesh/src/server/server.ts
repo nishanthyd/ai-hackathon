@@ -263,7 +263,7 @@ app.post('/api/tutor/chat', async (req, res) => {
 
   try {
     const client = getGroqClient();
-    const model = getGroqModel() || 'llama-3.3-70b-versatile';
+    const model = getGroqModel() || 'openai/gpt-oss-120b';
 
     const completion = await client.chat.completions.create({
       model: model,
