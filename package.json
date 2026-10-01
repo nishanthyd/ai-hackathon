@@ -4,6 +4,7 @@
   "private": true,
   "description": "EduVision multi-app workspace orchestrator.",
   "scripts": {
+    "build": "npm run build --prefix eduvision-main",
     "dev:all": "concurrently -k -n \"unesco,backend,trust-center\" -c \"cyan,magenta,yellow\" \"npm run dev --prefix unesco\" \"npm run serve --prefix neweduvisionkesh\" \"npm run dev --prefix eduvision-main\""
   },
   "devDependencies": {
