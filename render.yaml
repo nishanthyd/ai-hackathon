@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: eduvision-backend
+    runtime: docker
+    # Path to the Dockerfile, relative to the repository root
+    dockerfilePath: ./neweduvisionkesh/Dockerfile
+    # The Docker build context (where the app source lives)
+    dockerContext: ./neweduvisionkesh
+    # Render routes external HTTPS traffic to this port inside the container
+    port: 4000
+    # Health check — Render waits for this to return 200 before serving traffic
+    healthCheckPath: /health
+    # Keep the service alive (starter plan uses Render's free tier)
+    plan: starter
+    # Environment variables — set the actual values in the Render dashboard
+    # or via Render's API. Do NOT put real secrets here.
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      # Render sets this automatically to the service's public HTTPS URL.
+      # You do NOT need to set RENDER_EXTERNAL_URL manually.
+      - key: GROQ_API_KEY
+        sync: false  # You must set this manually in the Render dashboard
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+      - key: FRONTEND_ORIGIN
+        value: https://eduvision-main.vercel.app
+      # MANIM_API_URL is NOT used by the backend itself — it is for the Vercel frontend.
+      # Set it in Vercel to point to the Render service URL after deployment.

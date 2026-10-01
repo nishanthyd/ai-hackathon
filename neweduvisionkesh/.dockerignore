@@ -1,0 +1,30 @@
+# Docker — files excluded from the Docker build context
+
+# Node dependencies (reinstalled inside container)
+node_modules/
+
+# Generated media — these are ephemeral runtime artifacts, not source
+output/videos/*.mp4
+output/audio/**/*.mp3
+output/temporary/
+
+# Environment files — NEVER include secrets in the image
+.env
+.env.local
+.env.*.local
+
+# Development artifacts
+*.log
+.DS_Store
+Thumbs.db
+
+# Remotion cache
+.remotion/
+
+# TypeScript build cache
+dist/
+build/
+
+# Git metadata
+.git/
+.gitignore

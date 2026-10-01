@@ -22,14 +22,22 @@ import type {LessonInput} from '../lesson/lessonTypes';
 import {getGroqClient, getGroqModel} from '../groq/groqClient';
 
 const ROOT = process.cwd();
-// NOTE: avoid 3000 — Remotion's renderer uses it as its default port to serve
-// the bundle; keeping this server elsewhere prevents a port collision.
 const PORT = Number(process.env.PORT ?? 4000);
+
+// Configurable allowed frontend origins (comma-separated list)
+// Example: FRONTEND_ORIGIN=https://eduvision-main.vercel.app,http://localhost:3000
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';
+const allowedOrigins = FRONTEND_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
+
 const OUTPUT_DIR = path.join(ROOT, 'output', 'videos');
 const AUDIO_DIR = path.join(ROOT, 'output', 'audio');
 const PUBLIC_DIR = path.join(ROOT, 'public');
-const BASE_URL = `http://localhost:${PORT}`;
+
+// In production (Render), RENDER_EXTERNAL_URL is the public HTTPS hostname.
+// We use it to build absolute video URLs the Vercel frontend can actually reach.
+const BASE_URL = process.env.RENDER_EXTERNAL_URL
+  ? process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '')
+  : `http://localhost:${PORT}`;
 
 interface GenerateRequest {
   topic?: string;
@@ -81,7 +89,9 @@ async function runJob(job: Job): Promise<void> {
     job.status = 'done';
     job.stage = null;
     job.title = result.title;
-    job.videoUrl = `/output/videos/generated-${job.id}.mp4`;
+    // Return an absolute URL using BASE_URL so the Vercel frontend can reach it.
+    // On Render, BASE_URL = RENDER_EXTERNAL_URL (e.g. https://eduvision-backend.onrender.com)
+    job.videoUrl = `${BASE_URL}/output/videos/generated-${job.id}.mp4`;
     job.duration = result.duration;
   } catch (err) {
     job.status = 'error';
@@ -92,8 +102,26 @@ async function runJob(job: Job): Promise<void> {
 }
 
 const app = express();
-app.use(cors());
+
+// CORS — only allow the configured frontend origins
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Render health checks, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Also allow any localhost origin for local development
+    if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin '${origin}' is not allowed.`));
+  },
+  credentials: false,
+}));
 app.use(express.json());
+
+// ── Health check ─────────────────────────────────────────────
+// Render pings this before marking the service as live.
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', service: 'eduvision-video-generator', timestamp: new Date().toISOString() });
+});
 
 app.post('/api/generate', (req, res) => {
   const body = (req.body ?? {}) as GenerateRequest;
@@ -321,7 +349,10 @@ app.use('/audio', express.static(AUDIO_DIR));
 // Generated videos.
 app.use('/output/videos', express.static(OUTPUT_DIR));
 
-app.listen(PORT, () => {
+// Bind to 0.0.0.0 so Render (and Docker) can route external traffic to the container.
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n  EduVision video generator running`);
-  console.log(`  ▶ Open: http://localhost:${PORT}\n`);
+  console.log(`  ▶ Listening on: 0.0.0.0:${PORT}`);
+  console.log(`  ▶ Public base URL: ${BASE_URL}`);
+  console.log(`  ▶ Allowed frontend origins: ${allowedOrigins.join(', ')}\n`);
 });
