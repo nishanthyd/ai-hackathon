@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Generated output
+output/
+**/output/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Build/cache
+dist/
+build/
+.next/
+.cache/
+**/.cache/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

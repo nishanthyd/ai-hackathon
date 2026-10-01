@@ -1,0 +1,12 @@
+{
+  "name": "final-eduvision-root",
+  "version": "0.1.0",
+  "private": true,
+  "description": "EduVision multi-app workspace orchestrator.",
+  "scripts": {
+    "dev:all": "concurrently -k -n \"unesco,backend,trust-center\" -c \"cyan,magenta,yellow\" \"npm run dev --prefix unesco\" \"npm run serve --prefix neweduvisionkesh\" \"npm run dev --prefix eduvision-main\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
