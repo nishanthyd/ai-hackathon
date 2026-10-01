@@ -98,7 +98,7 @@ function MainLearningWorkspaceContent() {
             } else if (statusData.status === 'error') {
               clearInterval(pollInterval);
               setManimError(statusData.error || 'Failed to render Manim video.');
-              setManimVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4');
+              setManimVideoUrl('https://vjs.zencdn.net/v/oceans.mp4');
               setIsManimLoading(false);
             }
           } catch (e) {

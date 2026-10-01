@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       jobId: `demo_job_${Date.now()}`,
       status: 'done',
       title: `AI Visual Animation: ${topic} Call Stack`,
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
       duration: 35,
       source: 'demo_visualization',
     });

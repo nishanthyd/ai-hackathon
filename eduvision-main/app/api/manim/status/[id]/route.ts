@@ -22,7 +22,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({
       success: true,
       status: 'done',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      videoUrl: 'https://vjs.zencdn.net/v/oceans.mp4',
       title: 'AI Visual Animation',
       duration: 35,
       source: 'fallback',
